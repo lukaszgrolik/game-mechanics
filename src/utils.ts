@@ -3,6 +3,7 @@
 // Return FALSE if the lines don't intersect
 // export function lineSegmentsIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) {
 export function lineSegmentsIntersect(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2) {
+	// if (p1.x === p2.x || p1.x === p2.x || p1.y === p2.y || (p1.x + ))
 
   // Check if none of the lines are of length 0
 	if ((p1.x === p2.x && p1.y === p2.y) || (p3.x === p4.x && p3.y === p4.y)) {
@@ -13,7 +14,7 @@ export function lineSegmentsIntersect(p1: Vector2, p2: Vector2, p3: Vector2, p4:
 
   // Lines are parallel
 	if (denominator === 0) {
-		return false;
+		// return false;
 	}
 
 	const ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
@@ -25,10 +26,12 @@ export function lineSegmentsIntersect(p1: Vector2, p2: Vector2, p3: Vector2, p4:
 	}
 
   // Return a object with the x and y coordinates of the intersection
-	const x = p1.x + ua * (p2.x - p1.x);
-	const y = p1.y + ua * (p2.y - p1.y);
+	return true;
 
-	return {x, y};
+	// const x = p1.x + ua * (p2.x - p1.x);
+	// const y = p1.y + ua * (p2.y - p1.y);
+
+	// return {x, y};
 }
 
 export function circlesIntersect(c1: Circle, c2: Circle): boolean {
@@ -154,8 +157,23 @@ export class Vector2 {
 		this.y = y;
 	}
 
-	add(x: number, y: number): Vector2 {
-		return new Vector2(this.x + x, this.y + y);
+	add(x: number, y: number): Vector2;
+	add(v: Vector2): Vector2;
+	add(...args: unknown[]): Vector2 {
+		if (args[0] instanceof Vector2) {
+			const v = args[0];
+
+			return new Vector2(this.x + v.x, this.y + v.y);
+		}
+		else if (args.length === 2 && typeof args[0] === 'number' && typeof args[1] === 'number') {
+			const x = args[0];
+			const y = args[1];
+
+			return new Vector2(this.x + x, this.y + y);
+		}
+		else {
+			throw new Error('invalid ');
+		}
 	}
 
 	mult(val: number): Vector2 {
@@ -217,12 +235,12 @@ export class Box implements Shape2d {
 // }
 
 export class Polygon implements Shape2d {
-	readonly points: Vector2[] = [];
+	// readonly points: Vector2[] = [];
 	readonly lineSegments: LineSegment[] = [];
 	readonly boundingBox: Box;
 
-	constructor(points: Vector2[]) {
-		this.points.push(...points);
+	constructor(readonly points: Vector2[]) {
+		// this.points.push(...points);
 		this.lineSegments.push(...this.getSegments(this.points))
 		this.boundingBox = getBoundingBox(this.points);
 	}

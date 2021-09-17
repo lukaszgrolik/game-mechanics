@@ -26,3 +26,36 @@ export function samples<T>(arr: T[], n: number): T[] {
     return result;
 }
 
+export function randomNormal(): number {
+    let u = 0;
+    let v = 0;
+
+    while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while (v === 0) v = Math.random();
+
+    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+
+    num = num / 10.0 + 0.5; // Translate to 0 -> 1
+
+    if (num > 1 || num < 0) return randomNormal() // resample between 0 and 1
+
+    return num
+}
+
+export function sampleNormal<T>(values: T[]): T {
+    const val = Math.abs(randomNormal() - .5) * 2;
+    const l = values.length;
+
+    let found: T = null as any;
+
+    for (let i = 0; i < l; ++i) {
+        const x = (i + 1) / l;
+
+        if (val <= x) {
+            found = values[i]
+            break;
+        }
+    }
+
+    return found;
+}

@@ -20,8 +20,9 @@ export const GaView: React.FC<{ store: Store.Store }> = observer(({ store }) => 
         const wantedText = 'some text';
 
         geneticAlgorithm({
+            population: 1000,
             startValue: '',
-            callbackEveryIteration: 1000,
+            callbackEveryIteration: 10,
             calcFitness: (currentValue) => {
                 let currentFitness = 0;
 
@@ -36,6 +37,9 @@ export const GaView: React.FC<{ store: Store.Store }> = observer(({ store }) => 
                 }
 
                 return currentFitness;
+            },
+            canMutate: () => {
+                return Math.random() < .2;
             },
             mutate: (currentValue) => {
                 const chars = currentValue.split('');
@@ -93,13 +97,13 @@ export const GaView: React.FC<{ store: Store.Store }> = observer(({ store }) => 
 
                 return chars.join('');
             },
-            onIteration: (currentIteration, bestFittedArr) => {
-                console.log('iteration done', currentIteration, bestFittedArr.slice());
+            onGeneration: opts => {
+                console.log('iteration done', opts.generation, opts.meanFitness, opts.bestFitted.slice());
 
-                return currentIteration > 100_000 || (bestFittedArr.length > 0 && bestFittedArr[bestFittedArr.length - 1].value === wantedText);
+                return opts.generation > 100_000 || (opts.bestFitted.length > 0 && opts.bestFitted[opts.bestFitted.length - 1].value === wantedText);
             },
             onNewBestFitted: (currentIteration, bestFittedArr) => {
-                console.log('new best fitter', currentIteration, bestFittedArr.slice());
+                console.log('new best fitted', currentIteration, bestFittedArr.slice());
             },
         })
     }, []);

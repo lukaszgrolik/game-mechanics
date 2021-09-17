@@ -1,45 +1,73 @@
 interface BestFitted<T> {
     value: T;
     fitness: number;
-    iteration: number;
+    generation: number;
+}
+
+interface OnGenerationOpts<T> {
+    generation: number;
+    bestFitted: BestFitted<T>[]
+    meanFitness: number;
 }
 
 interface Opts<T> {
+    population: number;
     startValue: T;
     callbackEveryIteration: number;
     calcFitness: (value: T) => number;
+    canMutate: () => boolean;
     mutate: (value: T) => T;
-    onIteration: (currentIteration: number, bestFittedArr: BestFitted<T>[]) => void | boolean;
+    onGeneration: (opts: OnGenerationOpts<T>) => void | boolean;
     onNewBestFitted: (currentIteration: number, bestFittedArr: BestFitted<T>[]) => void;
 }
 
 export function geneticAlgorithm<T>(opts: Opts<T>) {
-    let currentIteration = 0;
-    let currentValue = opts.startValue;
+    let currentGen = 0;
+
+    const currentPopulation: T[] = new Array(opts.population).fill(opts.startValue);
+
+    // for (let i = 0; i < opts.population; i++) {
+    //     currentPopulation[i] = opts.startValue
+    // }
+
+    // let currentValue = opts.startValue;
     let currentFitness = 0;
 
     const bestFittedArr: BestFitted<T>[] = [];
 
     while (true) {
-        currentIteration += 1;
+        currentGen += 1;
+        let currentGenFitnessSum = 0;
 
-        currentValue = opts.mutate(currentValue);
-        currentFitness = opts.calcFitness(currentValue);
+        for (let i = 0; i < opts.population; i++) {
+            if (opts.canMutate()) {
+                currentPopulation[i] = opts.mutate(currentPopulation[i]);
+            }
 
-        const currentBestFitted = !bestFittedArr.length ? null : bestFittedArr[bestFittedArr.length - 1];
+            let currentValue = currentPopulation[i];
 
-        if (bestFittedArr.length === 0 || (currentBestFitted && currentFitness > currentBestFitted.fitness)) {
-            bestFittedArr.push({
-                iteration: currentIteration,
-                value: currentValue,
-                fitness: currentFitness,
-            });
+            currentFitness = opts.calcFitness(currentValue);
+            currentGenFitnessSum += currentFitness;
 
-            opts.onNewBestFitted(currentIteration, bestFittedArr);
+            const currentBestFitted = !bestFittedArr.length ? null : bestFittedArr[bestFittedArr.length - 1];
+
+            if (bestFittedArr.length === 0 || (currentBestFitted && currentFitness > currentBestFitted.fitness)) {
+                bestFittedArr.push({
+                    generation: currentGen,
+                    value: currentValue,
+                    fitness: currentFitness,
+                });
+
+                opts.onNewBestFitted(currentGen, bestFittedArr);
+            }
         }
 
-        if (currentIteration > 0 && currentIteration % opts.callbackEveryIteration === 0) {
-            const stop = opts.onIteration(currentIteration, bestFittedArr)
+        if (currentGen > 0 && currentGen % opts.callbackEveryIteration === 0) {
+            const stop = opts.onGeneration({
+                generation: currentGen,
+                bestFitted: bestFittedArr,
+                meanFitness: currentGenFitnessSum / opts.population,
+            });
 
             if (stop) {
                 break;
