@@ -102,11 +102,57 @@ export function polygonsIntersect(poly1: Polygon, poly2: Polygon): boolean {
 	}
 
 	// [step] check if one of the polygons is nested inside the other one
+	// let pointPolyIntersect = false;
+	// for (let i = 0; i < poly2.points.length; i++) {
+	// 	const point = poly2.points[i];
+
+	// 	if (pointAndPolygonIntersect(point, poly1)) {
+	// 		pointPolyIntersect = true;
+	// 		break;
+	// 	}
+	// }
+
+	// if (!polygonsIntersect) {
+	// 	for (let i = 0; i < poly1.points.length; i++) {
+	// 		const point = poly1.points[i];
+
+	// 		if (pointAndPolygonIntersect(point, poly2)) {
+	// 			pointPolyIntersect = true;
+	// 			break;
+	// 		}
+	// 	}
+	// }
+
+	if (pointAndPolygonIntersect(poly2.centroid, poly1) || pointAndPolygonIntersect(poly1.centroid, poly2)) {
+		return true
+	}
 
 	// @todo
 	// poly1.boundingBox.x - poly2.boundingBox.x
 
 	return false;
+}
+
+function pnpoly(nvert: number, vertx: number[], verty: number[], testx: number, testy: number): boolean {
+	let i = 0;
+	let j = 0;
+	let c = false;
+
+	for (i = 0, j = nvert - 1; i < nvert; j = i++) {
+		if (((verty[i] > testy) != (verty[j] > testy)) &&
+		(testx < (vertx[j] - vertx[i]) * (testy - verty[i]) / (verty[j] - verty[i]) + vertx[i])) {
+			c = !c;
+		}
+	}
+
+	return c;
+}
+
+export function pointAndPolygonIntersect(point: Vector2, polygon: Polygon): boolean {
+	const xPoints = polygon.points.map(p => p.x);
+	const yPoints = polygon.points.map(p => p.y);
+
+	return pnpoly(polygon.points.length, xPoints, yPoints, point.x, point.y);
 }
 
 export function getLineSegmentSize(p1: Vector2, p2: Vector2): number {
@@ -120,7 +166,7 @@ function getBoundingBox(points: Vector2[]): Box {
 	const yList = points.map(p => p.y);
 
 	const x = Math.min(...xList);
-	const y = Math.min(...xList);
+	const y = Math.min(...yList);
 	const w = Math.abs(x - Math.max(...xList));
 	const h = Math.abs(y - Math.max(...yList));
 
@@ -237,23 +283,39 @@ export class Box implements Shape2d {
 export class Polygon implements Shape2d {
 	// readonly points: Vector2[] = [];
 	readonly lineSegments: LineSegment[] = [];
+	readonly centroid: Vector2;
 	readonly boundingBox: Box;
 
 	constructor(readonly points: Vector2[]) {
 		// this.points.push(...points);
-		this.lineSegments.push(...this.getSegments(this.points))
+		this.lineSegments.push(...this.getSegments())
+		this.centroid = this.getCentroid();
 		this.boundingBox = getBoundingBox(this.points);
 	}
 
-	private getSegments(points: Vector2[]): LineSegment[] {
+	private getSegments(): LineSegment[] {
 		const res: LineSegment[] = [];
 
-		for (let i = 0; i < points.length - 1; i++) {
-			const p = points[i];
+		for (let i = 0; i < this.points.length - 1; i++) {
+			const p = this.points[i];
 
-			res.push(new LineSegment(p, points[i + 1]))
+			res.push(new LineSegment(p, this.points[i + 1]))
 		}
 
 		return res;
+	}
+
+	private getCentroid(): Vector2 {
+		let x = 0;
+		let y = 0;
+
+		for (let i = 0; i < this.points.length; i++) {
+			const p = this.points[i];
+
+			x += p.x / this.points.length;
+			y += p.y / this.points.length;
+		}
+
+		return new Vector2(x, y);
 	}
 }

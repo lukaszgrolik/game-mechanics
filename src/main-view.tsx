@@ -28,9 +28,9 @@ class Transform {
 
 abstract class Collider2d {
     static collides(c1: Collider2d, c2: Collider2d) {
-        const circleCollidesWithRect = (circleColl: CircleCollider, rectColl: RectCollider) => {
-            const circle = new Circle(circleColl.circle.position.x + circleColl.transform.position.x, circleColl.circle.position.y + circleColl.transform.position.y, circleColl.circle.r);
-            const box = new Box(rectColl.box.position.x + rectColl.transform.position.x, rectColl.box.position.y + rectColl.transform.position.y, rectColl.box.size.x, rectColl.box.size.y);
+        const circleCollidesWithRect = (c: CircleCollider, r: RectCollider) => {
+            const circle = new Circle(c.circle.position.x + c.transform.position.x, c.circle.position.y + c.transform.position.y, c.circle.r);
+            const box = new Box(r.box.position.x + r.transform.position.x, r.box.position.y + r.transform.position.y, r.box.size.x, r.box.size.y);
 
             return circleAndBoxIntersect(circle, box);
         }
@@ -82,14 +82,7 @@ class CircleCollider extends Collider2d {
     }
 
     collidesWith(other: Collider2d): boolean {
-        if (other instanceof CircleCollider) {
-            const c1 = new Circle(this.circle.position.x + this.transform.position.x, this.circle.position.y + this.transform.position.y, this.circle.r);
-            const c2 = new Circle(other.circle.position.x + other.transform.position.x, other.circle.position.y + other.transform.position.y, other.circle.r);
-
-            return circlesIntersect(c1, c2);
-        }
-
-        return false;
+        return Collider2d.collides(this, other);
     }
 }
 

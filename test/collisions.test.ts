@@ -1,7 +1,7 @@
 import 'mocha';
 import * as should from 'should';
 
-import { Box, boxesIntersect, Circle, circleAndBoxIntersect, circlesIntersect, getLineSegmentSize, lineSegmentsIntersect, Polygon, polygonsIntersect, Vector2 } from "../src/utils";
+import { Box, boxesIntersect, Circle, circleAndBoxIntersect, circlesIntersect, getLineSegmentSize, lineSegmentsIntersect, pointAndPolygonIntersect, Polygon, polygonsIntersect, Vector2 } from "../src/utils";
 
 describe('lineSegmentsIntersect', () => {
     const tests: { args: [Vector2, Vector2, Vector2, Vector2]; result: boolean; msg?: string }[] = [
@@ -88,6 +88,56 @@ describe('circleAndBoxIntersect', () => {
 
         it(`${test.msg} | ${testName}`, () => {
             const res = circleAndBoxIntersect(...test.args);
+            should.equal(res, test.result);
+        });
+    });
+});
+
+describe('pointAndPolygonIntersect', () => {
+    const tests: { args: [Vector2, Polygon]; result: boolean; msg?: string }[] = [
+        {
+            args: [
+                new Vector2(10, 10),
+                new Polygon([new Vector2(0, 0), new Vector2(0, 5), new Vector2(5, 5), new Vector2(5, 0)]),
+            ],
+            result: false,
+            msg: 'non-colliding',
+        },
+        {
+            args: [
+                new Vector2(0, 0),
+                new Polygon([new Vector2(0, 0), new Vector2(0, 5), new Vector2(5, 5), new Vector2(5, 0)]),
+            ],
+            result: true,
+            msg: 'collides at corner',
+        },
+        {
+            args: [
+                new Vector2(0, 2),
+                new Polygon([new Vector2(0, 0), new Vector2(0, 5), new Vector2(5, 5), new Vector2(5, 0)]),
+            ],
+            result: true,
+            msg: 'collides within a segment',
+        },
+        {
+            args: [
+                new Vector2(2, 2),
+                new Polygon([new Vector2(0, 0), new Vector2(0, 5), new Vector2(5, 5), new Vector2(5, 0)]),
+            ],
+            result: true,
+            msg: 'collides inside',
+        },
+    ];
+
+    tests.forEach(test => {
+        const point = test.args[0];
+        const poly = test.args[1];
+        const pointStr = `{${point.x},${point.y}}`;
+        const polyStr = (poly: Polygon) => `[${poly.points.map(p => `{${p.x},${p.y}}`).join(',')}]`;
+        const testName = `${pointStr} - ${polyStr(poly)}`;
+
+        it(`${test.msg} | ${testName}`, () => {
+            const res = pointAndPolygonIntersect(...test.args);
             should.equal(res, test.result);
         });
     });
@@ -217,7 +267,9 @@ describe('Vector2', () => {
 });
 
 describe('Polygon', () => {
-
+    describe('lineSegments');
+    describe('centroid');
+    describe('boundingBox');
 });
 
 describe('polygonsIntersect', () => {
