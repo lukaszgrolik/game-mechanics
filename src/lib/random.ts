@@ -1,3 +1,7 @@
+export function value(a: number = 0, b: number = 1) {
+    return a + Math.random() * (b - a);
+}
+
 export function range(start: number, end: number): number {
     return start + Math.floor(Math.random() * (end - start + 1));
 }
@@ -14,7 +18,7 @@ export function samples<T>(arr: T[], n: number): T[] {
     const taken = new Array(len);
 
     if (n > len) {
-        throw new RangeError("getRandom: more elements taken than available");
+        throw new RangeError("more elements taken than available");
     }
 
     while (n--) {

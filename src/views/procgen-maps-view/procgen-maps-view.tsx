@@ -4,9 +4,8 @@ import { action, makeObservable, observable } from 'mobx';
 import { observer } from "mobx-react-lite";
 import styled from '@emotion/styled';
 
-import * as random from '../random';
-import * as Store from '../store/store';
-import { getLineSegmentSize, Vector2 } from '../utils';
+import * as random from '../../lib/random';
+import * as Store from '../../store/store';
 
 const Wrapper = styled.div`
 

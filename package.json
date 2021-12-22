@@ -1,6 +1,9 @@
 {
     "scripts": {
-        "dev": "webpack serve"
+        "dev": "webpack serve",
+        "test": " npx mocha ./test/**/*.ts --require ts-node/register",
+        "test:geom": " npx mocha ./src/geom/test/**/*.ts --require ts-node/register",
+        "test:economy": " npx mocha ./src/economy/test/**/*.ts --require ts-node/register"
     },
     "dependencies": {
         "@emotion/react": "11.4.0",

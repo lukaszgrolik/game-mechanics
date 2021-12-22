@@ -4,10 +4,10 @@ import { BrowserRouter, Link, NavLink, Route, Switch } from 'react-router-dom';
 import styled from '@emotion/styled';
 
 import * as Store from './store/store';
-import { MainView } from './main-view';
-import { GaView } from './ga-view/ga-view';
-import { GraphView } from './graph-view/graph-view';
-import { ProcgenMapsView } from './procgen-maps-view/procgen-maps-view';
+import { MainView } from './views/main-view/main-view';
+import { GaView } from './views/ga-view/ga-view';
+import { GraphView } from './views/graph-view/graph-view';
+import { ProcgenMapsView } from './views/procgen-maps-view/procgen-maps-view';
 
 declare var window: {__store: Store.Store};
 
