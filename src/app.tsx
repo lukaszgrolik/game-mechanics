@@ -9,6 +9,7 @@ import { GaView } from './views/ga-view/ga-view';
 import { GraphView } from './views/graph-view/graph-view';
 import { ProcgenMapsView } from './views/procgen-maps-view/procgen-maps-view';
 import { ColorBoardView } from './views/color-board-view/color-board-view';
+import { ProcgenSvgView } from './views/procgen-svg-view/procgen-svg-view';
 
 declare var window: {__store: Store.Store};
 
@@ -55,6 +56,7 @@ const pages = [
     {path: '/quest-system', label: 'Quests', Component: MainView},
     {path: '/canvas-game', label: 'Canvas game', Component: MainView},
     {path: '/color-board', label: 'Color board', Component: ColorBoardView},
+    { path: '/procgen-svg', label: 'Procgen SVG', Component: ProcgenSvgView},
 ];
 
 const app = (
