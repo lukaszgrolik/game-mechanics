@@ -34,6 +34,7 @@ export function gaRects(opts: Opts) {
             // return currentFitness;
 
             // calc bounding rect size of all rects
+            return 0;
         },
         canMutate: () => {
             return Math.random() < .2;
@@ -95,11 +96,12 @@ export function gaRects(opts: Opts) {
             // return chars.join('');
 
             // move some/all to random place without colliding within current bounding box
+            return '';
         },
         onGeneration: opts => {
             console.log('iteration done', opts.generation, opts.meanFitness, opts.bestFitted.slice());
 
-            return opts.generation > 100_000 || (opts.bestFitted.length > 0 && opts.bestFitted[opts.bestFitted.length - 1].value === wantedText);
+            // return opts.generation > 100_000 || (opts.bestFitted.length > 0 && opts.bestFitted[opts.bestFitted.length - 1].value === wantedText);
         },
         onNewBestFitted: (currentIteration, bestFittedArr) => {
             console.log('new best fitted', currentIteration, bestFittedArr.slice());

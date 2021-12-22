@@ -15,10 +15,12 @@ export function posOnCircle(r: number, deg: number): Vector2 {
     const rad = deg * DEG_TO_RAD;
 
     // return [r * Math.sin(rad), r * Math.cos(rad)];
-    return new Vector2(r * Math.sin(rad), r * Math.cos(rad));
+    return new Vector2(r * Math.cos(rad), r * Math.sin(rad));
 }
 
 export function rotatePoint(p: Vector2, c: Vector2, deg: number): Vector2 {
+    // if (p.x === c.x && p.y === c.y) return p;
+
     const currentAngle = angle(c, p);
     console.log('currentAngle', currentAngle);
     const r = getLineSegmentSize(p, c);

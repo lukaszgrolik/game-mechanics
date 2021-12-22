@@ -7,6 +7,10 @@ export class Vector2 {
         return new Vector2(1, 1);
     }
 
+    static xy(arr: [number, number]) {
+        return new Vector2(arr[0], arr[1]);
+    }
+
     x: number;
     y: number;
 
