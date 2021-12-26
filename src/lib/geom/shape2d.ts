@@ -34,11 +34,15 @@ export class Box implements Shape2d {
 
     private getPoints(pos: Vector2, size: Vector2): BoxPoints {
         return [
-            pos,
-            pos.add(size.x, 0),
-            pos.add(size),
-            pos.add(0, size.y),
+            pos, // left bottom
+            pos.add(size.x, 0), // right bottom
+            pos.add(size), // right top
+            pos.add(0, size.y), // left top
         ];
+    }
+
+    getPerimeter() {
+        return this.size.x * 2 + this.size.y * 2;
     }
 }
 // console.log('boxesIntersect', boxesIntersect(new Box(0, 0, 10, 10), new Box(20, 20, 10, 10)))

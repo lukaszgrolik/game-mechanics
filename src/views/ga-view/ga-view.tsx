@@ -6,9 +6,13 @@ import styled from '@emotion/styled';
 
 import * as random from '../../lib/random';
 import * as Store from '../../store/store';
-import { CircleCollider, RectCollider, SimEngine, SimObject, Transform } from '../../lib/sim-engine/sim-engine';
 import { Vector2 } from '../../lib/geom/vec2';
 import { Box, Circle } from '../../lib/geom/shape2d';
+import { Transform } from '../../lib/sim-engine/transform';
+import { CircleCollider, RectCollider } from '../../lib/sim-engine/collider2d';
+import { SimObject } from '../../lib/sim-engine/sim-object';
+import { SimEngine } from '../../lib/sim-engine/sim-engine';
+import { gaRects } from './ga-rects';
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -66,15 +70,23 @@ export const GaView: React.FC<{ store: Store.Store }> = observer(({ store }) => 
     const [x, setX] = React.useState(0);
 
     React.useEffect(() => {
-        simEngine.events.on('objectsAdded', () => {
-            setX(x + 1);
-        });
+        // simEngine.events.on('objectsAdded', () => {
+        //     setX(x + 1);
+        // });
 
-        simEngine.events.on('collisionsUpdated', () => {
-            setX(x + 1);
-        });
+        // simEngine.events.on('collisionsUpdated', () => {
+        //     setX(x + 1);
+        // });
 
         initSimEngine(simEngine);
+
+        gaRects({
+            simEngine,
+            onGenerationFinished: () => {
+                console.log('onGenerationFinished')
+                setX(x + 1);
+            },
+        });
     }, []);
 
     return (

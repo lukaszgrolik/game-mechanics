@@ -10,7 +10,6 @@ import { boxesIntersect, circleAndBoxIntersect, circlesIntersect } from '../../l
 import { Box, Circle } from '../../lib/geom/shape2d';
 import { Vector2 } from '../../lib/geom/vec2';
 import * as random from '../../lib/random';
-import { CircleCollider, RectCollider, SimEngine, SimObject, Transform } from '../../lib/sim-engine/sim-engine';
 
 const Wrapper = styled.div`
 

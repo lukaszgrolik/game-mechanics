@@ -14,6 +14,12 @@ export function getBoundingBox(points: Vector2[]): Box {
     return new Box(x, y, w, h);
 }
 
+export function getBoundingBoxOfBoxes(boxes: Box[]): Box {
+    const points = boxes.flatMap(box => box.points);
+
+    return getBoundingBox(points);
+}
+
 export function getBoundingCircle(pos: Vector2, size: Vector2): Circle {
     const x = pos.x + size.x / 2;
     const y = pos.y + size.y / 2;
