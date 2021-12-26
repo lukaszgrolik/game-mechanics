@@ -13,6 +13,21 @@ import * as random from '../../lib/random';
 import { CircleCollider, RectCollider, SimEngine, SimObject, Transform } from '../../lib/sim-engine/sim-engine';
 import { posOnCircle } from '../../lib/geom/circle';
 
+namespace A {
+    class C {
+        // color: Color;
+        enabled = false;
+    }
+
+    export class X {
+        // colors:
+
+        run() {
+
+        }
+    }
+}
+
 const Wrapper = styled.div`
 
 `;
@@ -20,13 +35,12 @@ const Wrapper = styled.div`
 // const WIDTH = 1280;
 // const HEIGHT = 720;
 
-const opts_kb = {
-    keySize: { x: 20, y: 20},
-    keyboards: 4,
-    keys: 61,
+const opts_matrix1 = {
+    gridSize: { x: 61, y: 4 },
+    cellSize: { x: 20, y: 20 },
     gutter: 3,
 };
-const opts_matrix = {
+const opts_matrix2 = {
     gridSize: { x: 10, y: 10},
     cellSize: {x: 35, y: 35},
     gutter: 5,
@@ -52,8 +66,6 @@ const opts_radial = {
 };
 
 export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ store }) => {
-    const [simEngine1] = React.useState(new SimEngine());
-    const [simEngine2] = React.useState(new SimEngine());
 
     React.useEffect(() => {
 
@@ -61,7 +73,112 @@ export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ stor
 
     return (
         <Wrapper>
+            <TestBlock settings={opts_matrix1} />
+            <MatrixBlock settings={opts_matrix1} />
+            <MatrixBlock settings={opts_matrix2} />
+            <RadialBlock settings={opts_radial} />
+        </Wrapper>
+    );
+});
+
+function startLoop(cb: (deltaTime: number) => void) {
+    let start = 0
+    let previousTimeStamp = 0;
+    let delta = -1;
+    let prevDelta = -1;
+
+    function anim(timestamp: number) {
+        if (start === undefined) {
+            start = timestamp;
+        }
+        const elapsed = timestamp - start;
+        const delta = (timestamp - previousTimeStamp) / 1000;
+
+        // console.log('elapsed', elapsed, 'timestamp', timestamp)
+
+        cb(delta);
+
+        previousTimeStamp = timestamp
+
+        requestAnimationFrame(anim);
+    }
+
+    requestAnimationFrame(anim);
+}
+
+function startTestBlockLoop(opts: { svgEl: SVGSVGElement; settings: typeof opts_matrix1 }) {
+    const cells = new Map<string, Element>();
+    for (let y = 0; y < opts.settings.gridSize.y; y++) {
+        for (let x = 0; x < opts.settings.gridSize.x; x++) {
+            const key = `${x} ${y}`;
+            const el = opts.svgEl.querySelector(`[data-cell="${key}"]`);
+            if (!el) throw new Error(`cell not found: "${key}"`);
+
+            cells.set(key, el);
+        }
+    }
+    // console.log('cells', cells)
+
+    const currentCell = { x: 0, y: 0 };
+    const prevCell = { x: 0, y: 0 };
+
+    let testElapsed = 0;
+
+    //
+    //
+    //
+
+    startLoop(deltaTime => {
+        testElapsed += deltaTime;
+
+        if (testElapsed >= .1) {
+            testElapsed = 0;
+            // const x = random.range(0, settings.gridSize.x);
+            // const y = random.range(0, settings.gridSize.y);
+
+            const el = cells.get(`${currentCell.x} ${currentCell.y}`);
+            const prevEl = cells.get(`${prevCell.x} ${prevCell.y}`);
+
+            if (el && prevEl) {
+                const colorsCount = 6;
+                const hue = random.range(0, colorsCount - 1) * 360 / colorsCount;
+                prevEl.setAttribute('fill', `hsl(${hue}, 0%, 50%)`);
+                el.setAttribute('fill', `hsl(${hue}, 50%, 50%)`);
+            }
+
+            prevCell.x = currentCell.x;
+            prevCell.y = currentCell.y;
+
+            if (currentCell.x < opts.settings.gridSize.x - 1) {
+                currentCell.x += 1;
+            }
+            else {
+                currentCell.x = 0;
+
+                if (currentCell.y < opts.settings.gridSize.y - 1) {
+                    currentCell.y += 1;
+                }
+                else {
+                    currentCell.y = 0;
+                }
+            }
+        }
+    });
+}
+
+const TestBlock: React.FC<{ settings: typeof opts_matrix1 }> = observer(({settings}) => {
+    const svgEl = React.useRef<SVGSVGElement>(null)
+
+    React.useEffect(() => {
+        if (svgEl.current) {
+            startTestBlockLoop({svgEl: svgEl.current, settings});
+        }
+    }, []);
+
+    return (
+        <div>
             <svg
+                ref={svgEl}
                 width={1440}
                 height={150}
                 version="1.1"
@@ -69,26 +186,33 @@ export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ stor
                 style={{ backgroundColor: '#eee' }}
             >
                 {
-                    _.arr(opts_kb.keyboards).map(y => {
-                        return _.arr(opts_kb.keys).map(x => {
+                    _.arr(settings.gridSize.y).map(y => {
+                        return _.arr(settings.gridSize.x).map(x => {
                             const hue = Math.random() * 360;
 
                             return (
                                 <rect
                                     key={`${x}x${y}`}
-                                    x={x * opts_kb.keySize.x + opts_kb.gutter * x}
-                                    y={y * opts_kb.keySize.y + opts_kb.gutter * y}
-                                    width={opts_kb.keySize.x}
-                                    height={opts_kb.keySize.y}
+                                    data-cell={`${x} ${y}`}
+                                    x={x * settings.cellSize.x + settings.gutter * x}
+                                    y={y * settings.cellSize.y + settings.gutter * y}
+                                    width={settings.cellSize.x}
+                                    height={settings.cellSize.y}
                                     strokeWidth={0}
-                                    fill={`hsl(${hue}, 50%, 50%)`}
+                                    fill={`hsl(${hue}, 0%, 50%)`}
                                 />
                             );
                         });
                     })
                 }
             </svg>
+        </div>
+    )
+});
 
+const MatrixBlock: React.FC<{ settings: typeof opts_matrix1 }> = observer(({ settings }) => {
+    return (
+        <div>
             <svg
                 width={1440}
                 height={500}
@@ -97,17 +221,17 @@ export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ stor
                 style={{ backgroundColor: '#eee' }}
             >
                 {
-                    _.arr(opts_matrix.gridSize.y).map(y => {
-                        return _.arr(opts_matrix.gridSize.x).map(x => {
+                    _.arr(settings.gridSize.y).map(y => {
+                        return _.arr(settings.gridSize.x).map(x => {
                             const hue = Math.random() * 360;
 
                             return (
                                 <rect
                                     key={`${x}x${y}`}
-                                    x={x * opts_matrix.cellSize.x + opts_matrix.gutter * x}
-                                    y={y * opts_matrix.cellSize.y + opts_matrix.gutter * y}
-                                    width={opts_matrix.cellSize.x}
-                                    height={opts_matrix.cellSize.y}
+                                    x={x * settings.cellSize.x + settings.gutter * x}
+                                    y={y * settings.cellSize.y + settings.gutter * y}
+                                    width={settings.cellSize.x}
+                                    height={settings.cellSize.y}
                                     strokeWidth={0}
                                     fill={`hsl(${hue}, 50%, 50%)`}
                                 />
@@ -116,7 +240,18 @@ export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ stor
                     })
                 }
             </svg>
+        </div>
+    );
+});
 
+const RadialBlock: React.FC<{ settings: typeof opts_radial }> = observer(({ settings }) => {
+
+    React.useEffect(() => {
+
+    }, []);
+
+    return (
+        <div>
             <svg
                 width={1440}
                 height={500}
@@ -126,7 +261,7 @@ export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ stor
             >
                 <g transform={`translate(${200}, ${200})`}>
                     {
-                        opts_radial.lines.map((line, lineN) => {
+                        settings.lines.map((line, lineN) => {
                             const angle = 360 / line.points;
                             // console.log('fragments', fragments)
 
@@ -150,6 +285,6 @@ export const ColorBoardView: React.FC<{ store: Store.Store }> = observer(({ stor
                     }
                 </g>
             </svg>
-        </Wrapper>
+        </div>
     );
 });
