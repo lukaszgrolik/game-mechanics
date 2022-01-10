@@ -6,4 +6,9 @@ export class Transform {
     constructor(body: { position: Vector2 }) {
         this.position = body.position;
     }
+
+    setPosition(pos: Vector2) {
+        this.position.x = pos.x;
+        this.position.y = pos.y;
+    }
 }

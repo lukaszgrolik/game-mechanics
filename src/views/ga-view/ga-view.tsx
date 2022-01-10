@@ -14,15 +14,15 @@ import { SimObject } from '../../lib/sim-engine/sim-object';
 import { SimEngine } from '../../lib/sim-engine/sim-engine';
 import { gaRects } from './ga-rects';
 
-const WIDTH = 1280;
-const HEIGHT = 720;
+const WIDTH = 800;
+const HEIGHT = 480;
 
 function initSimEngine(simEngine: SimEngine) {
     const getRandomRectObject = () => {
         const x = random.value(0, WIDTH);
         const y = random.value(0, HEIGHT);
-        const w = random.value(25, 200);
-        const h = random.value(25, 200);
+        const w = random.value(10, 100);
+        const h = random.value(10, 100);
 
         const box = new Box(0, 0, w, h);
 
@@ -35,7 +35,7 @@ function initSimEngine(simEngine: SimEngine) {
 
         return simObj;
     }
-    const rectObjects = new Array(30).fill(null).map((_, i) => {
+    const rectObjects = new Array(5).fill(null).map((_, i) => {
         return getRandomRectObject();
     });
     // const circleObjects = new Array(30).fill(null).map((_, i) => {
@@ -56,9 +56,26 @@ function initSimEngine(simEngine: SimEngine) {
     // });
 
     // simEngine.addObjects([...rectObjects, ...circleObjects]);
-    simEngine.addObjects([...rectObjects]);
-
+    simEngine.addObjects(...rectObjects);
     simEngine.detectCollisions();
+
+    const rectsBB = (() => {
+        const box = new Box(0, 0, WIDTH, HEIGHT);
+        const transform = new Transform({
+            position: new Vector2(0, 0),
+        });
+        const collider = new RectCollider(transform, box, false);
+        const simObj = new SimObject(transform, collider);
+
+        simEngine.addObjects(simObj);
+
+        return simObj;
+    })();
+
+    return {
+        rectObjects,
+        rectsBB,
+    };
 }
 
 const Wrapper = styled.div`
@@ -78,15 +95,22 @@ export const GaView: React.FC<{ store: Store.Store }> = observer(({ store }) => 
         //     setX(x + 1);
         // });
 
-        initSimEngine(simEngine);
+        const {rectObjects, rectsBB} = initSimEngine(simEngine);
 
         gaRects({
+            size: {width: WIDTH, height: HEIGHT},
             simEngine,
+            rectObjects,
+            rectsBB,
             onGenerationFinished: () => {
                 console.log('onGenerationFinished')
-                setX(x + 1);
+            },
+            onNewBestFitted: () => {
+
             },
         });
+
+        setX(x + 1);
     }, []);
 
     return (
@@ -94,8 +118,14 @@ export const GaView: React.FC<{ store: Store.Store }> = observer(({ store }) => 
             <svg width={WIDTH} height={HEIGHT} version="1.1" xmlns="http://www.w3.org/2000/svg" style={{ backgroundColor: '#eee' }}>
                 {
                     simEngine.getObjects().map((obj, i) => {
+                        if (!obj.collider2d) return null;
+
                         const isColliding = simEngine.getCollisions().includes(obj);
-                        const color = isColliding ? 'red' : 'black';
+                        const color = (() => {
+                            if (obj.collider2d.isActive === false) return 'grey';
+
+                            return isColliding ? 'red' : 'black';
+                        })();
 
                         if (obj.collider2d instanceof RectCollider) {
                             return (

@@ -19,7 +19,7 @@ export class SimEngine {
         return this.objects.slice();
     }
 
-    addObjects(objects: SimObject[]) {
+    addObjects(...objects: SimObject[]) {
         this.objects.push(...objects);
 
         this.events.emit('objectsAdded');
@@ -34,11 +34,13 @@ export class SimEngine {
 
         for (let i = 0; i < this.objects.length; i++) {
             const obj = this.objects[i];
+            if (!obj.collider2d || obj.collider2d.isActive === false) continue;
 
             for (let j = 0; j < this.objects.length; j++) {
                 if (i === j) continue;
 
                 const obj2 = this.objects[j];
+                if (!obj2.collider2d || obj2.collider2d.isActive === false) continue;
 
                 if (obj.collider2d.collidesWith(obj2.collider2d)) {
                     this.collisions.push(obj);

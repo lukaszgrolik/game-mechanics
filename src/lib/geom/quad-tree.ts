@@ -162,6 +162,19 @@ export class QuadTree<T extends QuadTreeObject> {
 
     // @todo perf test
     public findCollisionsByQuads(): T[] {
+        return this.x(this.quads);
+    }
+
+    public overlapRectangle(x: number, y: number, w: number, h: number): T[] {
+        const collisions: T[] = [];
+
+        // @todo find quads that collide with rectangle
+        const quads: Quad[] = []
+
+        return this.x(quads);
+    }
+
+    private x(quads: Quad[]): T[] {
         const collisions: T[] = [];
 
         return collisions;

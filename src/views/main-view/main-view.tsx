@@ -43,7 +43,7 @@ function initSimEngine1(simEngine: SimEngine) {
         return getRandomRectObject();
     });
 
-    simEngine.addObjects(rectObjects);
+    simEngine.addObjects(...rectObjects);
 
     simEngine.detectCollisions();
 
@@ -93,7 +93,7 @@ function initSimEngine2(simEngine: SimEngine) {
         return simObj;
     });
 
-    simEngine.addObjects([...rectObjects, ...circleObjects]);
+    simEngine.addObjects(...rectObjects, ...circleObjects);
 
     simEngine.detectCollisions();
 }

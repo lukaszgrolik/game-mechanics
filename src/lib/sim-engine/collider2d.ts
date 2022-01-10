@@ -35,8 +35,14 @@ export abstract class Collider2d {
         }
     }
 
-    constructor(readonly transform: Transform) {
+    isActive: boolean;
 
+    constructor(readonly transform: Transform, isActive: boolean) {
+        this.isActive = isActive;
+    }
+
+    setIsActive(val: boolean) {
+        this.isActive = val;
     }
 
     abstract collidesWith(other: Collider2d): boolean;
@@ -44,8 +50,8 @@ export abstract class Collider2d {
 }
 
 export class RectCollider extends Collider2d {
-    constructor(transform: Transform, readonly box: Box) {
-        super(transform);
+    constructor(transform: Transform, readonly box: Box, isActive: boolean = true) {
+        super(transform, isActive);
     }
 
     collidesWith(other: Collider2d): boolean {
@@ -58,8 +64,8 @@ export class RectCollider extends Collider2d {
 }
 
 export class CircleCollider extends Collider2d {
-    constructor(transform: Transform, readonly circle: Circle) {
-        super(transform);
+    constructor(transform: Transform, readonly circle: Circle, isActive: boolean = true) {
+        super(transform, isActive);
     }
 
     collidesWith(other: Collider2d): boolean {

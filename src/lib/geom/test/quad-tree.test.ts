@@ -112,4 +112,8 @@ describe('quad-tree', () => {
     describe('findCollisionsByQuads', () => {
 
     });
+
+    describe('overlapRectangle', () => {
+
+    });
 });

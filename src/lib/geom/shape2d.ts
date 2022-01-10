@@ -21,8 +21,8 @@ export class Box implements Shape2d {
     readonly position: Vector2;
     readonly size: Vector2;
 
-    readonly points: BoxPoints;
-    readonly boundingCircle: Circle;
+    points: BoxPoints;
+    boundingCircle: Circle;
 
     constructor(x: number, y: number, w: number, h: number) {
         this.position = new Vector2(x, y);
@@ -39,6 +39,14 @@ export class Box implements Shape2d {
             pos.add(size), // right top
             pos.add(0, size.y), // left top
         ];
+    }
+
+    setSize(size: Vector2) {
+        this.size.x = size.x;
+        this.size.y = size.y;
+
+        this.points = this.getPoints(this.position, size);
+        this.boundingCircle = getBoundingCircle(this.position, size);
     }
 
     getPerimeter() {
