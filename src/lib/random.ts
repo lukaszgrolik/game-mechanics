@@ -3,7 +3,8 @@ export function value(a: number = 0, b: number = 1) {
 }
 
 export function range(start: number, end: number): number {
-    return start + Math.floor(Math.random() * (end - start + 1));
+    // return start + Math.floor(Math.random() * (end - start + 1));
+    return start + Math.floor(Math.random() * (end - start));
 }
 
 export function sample<T>(arr: T[]): T {
@@ -62,4 +63,35 @@ export function sampleNormal<T>(values: T[]): T {
     }
 
     return found;
+}
+
+export namespace weighted {
+    export function value(cfg: number[]): number {
+        let sum = 0;
+        for (let i = 0; i < cfg.length; ++i) {
+            sum += cfg[i];
+        }
+
+        const index = Math.floor(Math.random() * sum);
+
+        let currentSum = 0;
+        for (let i = 0; i < cfg.length; ++i) {
+            currentSum += cfg[i];
+            if (index < currentSum) return i;
+        }
+
+        throw new Error("iteration exceeded");
+    }
+
+    export function sample<T>(cfg: number[], arr: T[]) {
+        if (cfg.length != arr.length) throw new Error('weights and values must be of the same length');
+
+        const index = value(cfg);
+
+        return arr[index];
+    }
+
+    export function samples() {
+
+    }
 }
